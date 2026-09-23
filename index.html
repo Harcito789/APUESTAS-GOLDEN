@@ -982,7 +982,7 @@
         </div>
       </div>
 
-      <a class="btn btn-gold" href="https://wa.me/51925931665?text=Hola%2C%20quiero%20informaci%C3%B3n%20de%20Golden%20Bankroll" target="_blank" rel="noopener">Quiero mi Golden Bankroll →</a>
+      <a class="btn btn-gold" id="bankrollCta" href="https://wa.me/51925931665?text=Hola%2C%20quiero%20informaci%C3%B3n%20de%20Golden%20Bankroll" target="_blank" rel="noopener">Quiero mi Golden Bankroll →</a>
     </div>
 
     <div class="vip-banner">
@@ -2998,6 +2998,11 @@
     set('bkComision', comisionCents);
     set('bkReserva', reservaCents, '− ');
     set('bkTotal', totalCents);
+    const cta = document.getElementById('bankrollCta');
+    if (cta){
+      const ctaMsg = 'Hola, quiero mi plan Golden Bankroll ' + t.label + ' (S/' + t.capital + ' de capital inicial)';
+      cta.href = 'https://wa.me/51925931665?text=' + encodeURIComponent(ctaMsg);
+    }
     document.querySelectorAll('#bankrollTiers .bankroll-tier').forEach(btn => {
       btn.classList.toggle('is-selected', btn.dataset.tier === tierKey);
     });
@@ -3032,7 +3037,14 @@
     initCalculator();
     applyAdminGating();
     document.querySelectorAll('#bankrollTiers .bankroll-tier').forEach(btn => {
-      btn.addEventListener('click', () => updateBankrollExample(btn.dataset.tier));
+      btn.addEventListener('click', () => {
+        const tierKey = btn.dataset.tier;
+        updateBankrollExample(tierKey);
+        const t = BANKROLL_TIERS[tierKey];
+        if (!t) return;
+        const msg = 'Hola, quiero mi plan Golden Bankroll ' + t.label + ' (S/' + t.capital + ' de capital inicial)';
+        window.open('https://wa.me/51925931665?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+      });
     });
     document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchView(t.dataset.view)));
     document.querySelectorAll('[data-goto-view]').forEach(b => b.addEventListener('click', () => {
