@@ -131,6 +131,50 @@
   .calc-card .btn{ align-self: flex-start; }
   @media (max-width: 640px){ .calc-card .btn{ width: 100%; } }
 
+  .diff-section{ margin-bottom: 22px; }
+  .diff-section__head{ text-align: center; max-width: 640px; margin: 0 auto 24px; }
+  .diff-section__head h2{ font-size: 26px; color: var(--text); margin-bottom: 8px; }
+  .diff-section__head p{ font-size: 14px; color: var(--text-dim); }
+  .diff-cards{ display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .diff-card{
+    background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius-lg);
+    padding: 22px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .diff-card__icon{
+    width: 44px; height: 44px; border-radius: 12px; background: var(--gold-soft); display: flex;
+    align-items: center; justify-content: center; margin-bottom: 4px;
+  }
+  .diff-card h3{ font-size: 16px; color: var(--text); }
+  .diff-card p{ font-size: 13.5px; color: var(--text-dim); line-height: 1.6; }
+
+  .leagues-section{ text-align: center; margin-bottom: 22px; }
+  .leagues-section h2{ font-size: 20px; color: var(--text); margin-bottom: 16px; }
+  .leagues-grid{ display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .league-chip{
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim);
+    padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 600;
+  }
+
+  .faq-section, .glossary-section{ margin: 8px 0 22px; }
+  .faq-section h2, .glossary-section h2{ font-size: 22px; color: var(--text); margin-bottom: 16px; text-align: center; }
+  .faq-list{ display: flex; flex-direction: column; gap: 10px; max-width: 760px; margin: 0 auto; }
+  .faq-item{
+    background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius-md); padding: 16px 18px;
+  }
+  .faq-item summary{ font-size: 14.5px; font-weight: 600; color: var(--text); cursor: pointer; list-style: none; position: relative; padding-right: 24px; }
+  .faq-item summary::-webkit-details-marker{ display: none; }
+  .faq-item summary::after{ content: '+'; position: absolute; right: 0; top: 0; color: var(--gold-strong); font-size: 18px; }
+  .faq-item[open] summary::after{ content: '−'; }
+  .faq-item p{ font-size: 13.5px; color: var(--text-dim); line-height: 1.6; margin-top: 10px; }
+
+  .glossary-list{ display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; max-width: 900px; margin: 0 auto; }
+  .glossary-item{
+    background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius-md); padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .glossary-item strong{ color: var(--gold-strong); font-size: 14px; }
+  .glossary-item span{ font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+
   .wrap{ max-width: 1180px; margin: 0 auto; padding: 20px 20px 64px; }
 
   /* ---------- Header ---------- */
@@ -304,7 +348,8 @@
   .tab--vip{ display:inline-flex; align-items:center; gap:6px; }
   .tab--vip.is-active{ color: var(--gold-strong); border-bottom-color: var(--gold); }
   .vip-banner{
-    background: linear-gradient(135deg, rgba(240,201,74,0.16), rgba(240,201,74,0.02) 60%);
+    background-image: linear-gradient(100deg, rgba(10,13,18,0.93) 45%, rgba(240,201,74,0.14) 100%), url('https://images.unsplash.com/photo-1517747614396-d21a78b850e8?q=80&w=1400&auto=format&fit=crop');
+    background-size: cover; background-position: center;
     border: 1px solid var(--gold-line); border-radius: var(--radius-lg);
     padding: 22px 24px; display:flex; align-items:center; gap:16px; flex-wrap: wrap; position: relative; overflow:hidden;
   }
@@ -464,7 +509,16 @@
   }
 
   /* ---------- Hero ---------- */
-  .hero{ display:flex; flex-wrap:wrap; gap:28px; align-items:center; justify-content:space-between; padding:8px 2px 26px; }
+  .hero{
+    display:flex; flex-wrap:wrap; gap:28px; align-items:center; justify-content:space-between;
+    padding:36px 32px; border-radius:var(--radius-lg); margin-bottom:8px; position:relative; overflow:hidden;
+    background-image: linear-gradient(100deg, rgba(10,13,18,0.97) 38%, rgba(10,13,18,0.75) 65%, rgba(10,13,18,0.45) 100%), url('https://images.unsplash.com/photo-1762013315117-1c8005ad2b41?q=80&w=1600&auto=format&fit=crop');
+    background-size: cover; background-position: center 35%;
+    border:1px solid var(--border-soft);
+  }
+  @media (max-width:760px){
+    .hero{ background-image: linear-gradient(180deg, rgba(10,13,18,0.97) 55%, rgba(10,13,18,0.7) 100%), url('https://images.unsplash.com/photo-1762013315117-1c8005ad2b41?q=80&w=1600&auto=format&fit=crop'); padding:28px 20px; }
+  }
   .hero__text{ flex:1 1 380px; min-width:280px; }
   .hero__eyebrow{
     display:inline-block; font-family:var(--font-mono); font-size:11.5px; letter-spacing:1px; text-transform:uppercase;
@@ -655,6 +709,53 @@
       <span class="v num" id="calc_resultado">S/ 0.00</span>
     </div>
     <a class="btn btn-gold" href="https://wa.me/51925931665?text=Hola%2C%20quiero%20mi%20plan%20personalizado" target="_blank" rel="noopener">Quiero mi plan personalizado →</a>
+  </section>
+
+  <section class="diff-section">
+    <div class="diff-section__head">
+      <h2>¿Por qué somos diferentes?</h2>
+      <p>No somos una herramienta de estadísticas más. Esto es lo que nos separa del resto.</p>
+    </div>
+    <div class="diff-cards">
+      <div class="diff-card">
+        <div class="diff-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold-strong)" stroke-width="1.8"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+        </div>
+        <h3>Hacemos el trabajo por ti</h3>
+        <p>No te tiramos números sueltos para que adivines. Te decimos exactamente qué apostar, cuánto y a qué cuota — y en Golden Bankroll, te armamos el plan completo.</p>
+      </div>
+      <div class="diff-card">
+        <div class="diff-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold-strong)" stroke-width="1.8"><path d="M12 2l2.4 6.9L21 9l-5.5 4.6L17 21l-5-3.6L7 21l1.5-7.4L3 9l6.6-.1z"/></svg>
+        </div>
+        <h3>Transparencia radical</h3>
+        <p>La mayoría de tipsters borra lo que pierde y solo muestra lo que gana. Nosotros no — cada apuesta queda registrada tal cual sucedió, ganada o perdida, sin editar el pasado.</p>
+      </div>
+      <div class="diff-card">
+        <div class="diff-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold-strong)" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <h3>Trato humano, no una app fría</h3>
+        <p>Hablas directo con un analista real por WhatsApp — no con un dashboard anónimo. Dudas, ajustes, acompañamiento: siempre hay alguien del otro lado.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="leagues-section">
+    <h2>Ligas que cubrimos</h2>
+    <div class="leagues-grid">
+      <span class="league-chip">Champions League</span>
+      <span class="league-chip">Premier League</span>
+      <span class="league-chip">La Liga</span>
+      <span class="league-chip">Serie A</span>
+      <span class="league-chip">Bundesliga</span>
+      <span class="league-chip">Liga 1 Perú</span>
+      <span class="league-chip">Copa Libertadores</span>
+      <span class="league-chip">Liga Argentina</span>
+      <span class="league-chip">Brasileirao</span>
+      <span class="league-chip">Eliminatorias CONMEBOL</span>
+      <span class="league-chip">Y más...</span>
+    </div>
   </section>
 
   <nav class="tabs" role="tablist">
@@ -1063,6 +1164,39 @@
     </div>
   </section>
 
+  <section class="faq-section">
+    <h2>Preguntas frecuentes</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>¿Es legal apostar deportivamente en Perú?</summary>
+        <p>Sí. Las apuestas deportivas son legales en Perú a través de casas de apuestas autorizadas (como Betano). Este sitio es de análisis y educación — tú decides en qué casa de apuestas jugar.</p>
+      </details>
+      <details class="faq-item">
+        <summary>¿Cómo sé que los resultados son reales?</summary>
+        <p>Cada apuesta queda registrada en esta misma página tal cual sucedió — incluyendo las que perdemos. No editamos ni borramos nada del historial, a diferencia de la mayoría de tipsters.</p>
+      </details>
+      <details class="faq-item">
+        <summary>¿Qué pasa si pierdo mi dinero siguiendo un pick?</summary>
+        <p>Ningún pick tiene 100% de certeza — las apuestas deportivas conllevan riesgo real. Nunca apuestes más de lo que puedas permitirte perder. En Golden Bankroll, la Garantía Golden cubre la tarifa de reserva del servicio (no el capital apostado).</p>
+      </details>
+      <details class="faq-item">
+        <summary>¿Necesito experiencia previa para unirme?</summary>
+        <p>No. Explicamos cada pick con el detalle necesario, y en Golden Bankroll te acompañamos paso a paso aunque sea tu primera vez.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="glossary-section">
+    <h2>Glosario rápido de apuestas</h2>
+    <div class="glossary-list">
+      <div class="glossary-item"><strong>Cuota</strong><span>El número que multiplica tu stake si ganas. Una cuota de 1.50 convierte S/10 en S/15.</span></div>
+      <div class="glossary-item"><strong>Bet Builder</strong><span>Una apuesta combinada dentro de un mismo partido (ej. "gana + más de 2.5 goles") con una sola cuota conjunta.</span></div>
+      <div class="glossary-item"><strong>Hándicap asiático</strong><span>Una ventaja o desventaja de goles que se le da a un equipo antes de empezar, para equilibrar la cuota.</span></div>
+      <div class="glossary-item"><strong>Cash out</strong><span>Retirar una apuesta antes de que termine el partido, asegurando una ganancia o pérdida parcial en vez de esperar el resultado final.</span></div>
+      <div class="glossary-item"><strong>Doble oportunidad</strong><span>Cubrir dos de los tres resultados posibles de un partido (ej. "gana o empata") a cambio de una cuota más baja.</span></div>
+    </div>
+  </section>
+
   <footer class="site-footer">
     <div class="site-footer__row">
       <div class="site-footer__brand">
@@ -1078,6 +1212,8 @@
       <button type="button" class="site-footer__link" id="btnOpenPrivacy">Política de Privacidad</button>
       <span>·</span>
       <span>© 2026 Apuestas Golden VIP</span>
+      <span>·</span>
+      <span>Fotos: Unsplash</span>
     </div>
   </footer>
 
@@ -2622,7 +2758,7 @@
   /** Fades each card in the moment it scrolls into view, instead of all
    * at once — purely cosmetic, skipped entirely for reduced-motion users. */
   function setupScrollReveal(){
-    const targets = document.querySelectorAll('.card, .bankroll-card, .bankroll-proof');
+    const targets = document.querySelectorAll('.card, .bankroll-card, .bankroll-proof, .diff-card');
     if (prefersReducedMotion() || !('IntersectionObserver' in window)){
       targets.forEach(el => el.classList.add('is-visible'));
       return;
