@@ -64,7 +64,7 @@
   }
 
   *,*::before,*::after{ box-sizing: border-box; }
-  html{ background: var(--bg); }
+  html{ background: var(--bg); overflow-anchor: none; }
   body{
     background: var(--bg);
     color: var(--text);
@@ -174,6 +174,33 @@
   }
   .glossary-item strong{ color: var(--gold-strong); font-size: 14px; }
   .glossary-item span{ font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+
+  .app-section[hidden]{ display: none !important; }
+  .launcher-screen[hidden], .back-to-menu[hidden]{ display: none !important; }
+  .launcher-screen{
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    padding: 60px 20px 40px; gap: 6px;
+  }
+  .launcher-screen__star{ margin-bottom: 10px; }
+  .launcher-screen__title{ font-size: 28px; color: var(--text); }
+  .launcher-screen__sub{ font-size: 14px; color: var(--text-dim); margin-bottom: 28px; }
+  .launcher-grid{ display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; width: 100%; max-width: 900px; }
+  .launcher-card{
+    background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius-lg);
+    padding: 24px 20px; display: flex; flex-direction: column; gap: 8px; text-align: left; cursor: pointer;
+    transition: border-color .15s, transform .15s; font-family: inherit;
+  }
+  .launcher-card:hover{ border-color: var(--accent-line); transform: translateY(-3px); }
+  .launcher-card.is-gold{ border-color: var(--gold-line); background: linear-gradient(160deg, rgba(240,201,74,0.08), var(--surface) 60%); }
+  .launcher-card.is-gold:hover{ border-color: var(--gold-strong); }
+  .launcher-card__label{ font-size: 17px; font-weight: 700; color: var(--text); font-family: var(--font-display); }
+  .launcher-card__desc{ font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
+  .back-to-menu{ margin-bottom: 14px; }
+  .back-to-menu button{
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); border-radius: 999px;
+    padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  .back-to-menu button:hover{ color: var(--text); border-color: var(--accent-line); }
 
   .wrap{ max-width: 1180px; margin: 0 auto; padding: 20px 20px 64px; }
 
@@ -671,6 +698,39 @@
     </div>
   </header>
 
+  <section id="launcherScreen" class="launcher-screen">
+    <svg class="launcher-screen__star" width="40" height="40" viewBox="0 0 24 24" fill="var(--gold)" stroke="none"><path d="M12 2l2.4 6.9L21 9l-5.5 4.6L17 21l-5-3.6L7 21l1.5-7.4L3 9l6.6-.1z"/></svg>
+    <h1 class="launcher-screen__title">¿Qué quieres ver?</h1>
+    <p class="launcher-screen__sub">Elige una sección para entrar.</p>
+    <div class="launcher-grid">
+      <button type="button" class="launcher-card" data-launch="landing">
+        <span class="launcher-card__label">Inicio</span>
+        <span class="launcher-card__desc">Quiénes somos, cómo funciona, preguntas frecuentes</span>
+      </button>
+      <button type="button" class="launcher-card" data-launch="free">
+        <span class="launcher-card__label">Grupo Free</span>
+        <span class="launcher-card__desc">Picks gratuitos y estadísticas en vivo</span>
+      </button>
+      <button type="button" class="launcher-card" data-launch="reto">
+        <span class="launcher-card__label">Reto 1K</span>
+        <span class="launcher-card__desc">De S/5 a S/1,000 — la escalera en vivo</span>
+      </button>
+      <button type="button" class="launcher-card is-gold" data-launch="vip">
+        <span class="launcher-card__label">Grupo VIP</span>
+        <span class="launcher-card__desc">Picks premium y estadísticas exclusivas</span>
+      </button>
+      <button type="button" class="launcher-card is-gold" data-launch="bankroll">
+        <span class="launcher-card__label">Golden Bankroll</span>
+        <span class="launcher-card__desc">Asesoría personalizada de banca</span>
+      </button>
+    </div>
+  </section>
+
+  <div id="backToMenuBar" class="back-to-menu" hidden>
+    <button type="button" id="btnBackToMenu">← Volver al menú</button>
+  </div>
+
+  <div id="landingContent" class="app-section" hidden>
   <section class="hero">
     <div class="hero__text">
       <span class="hero__eyebrow">Resultados verificados en vivo</span>
@@ -758,6 +818,41 @@
     </div>
   </section>
 
+  <section class="faq-section">
+    <h2>Preguntas frecuentes</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>¿Es legal apostar deportivamente en Perú?</summary>
+        <p>Sí. Las apuestas deportivas son legales en Perú a través de casas de apuestas autorizadas (como Betano). Este sitio es de análisis y educación — tú decides en qué casa de apuestas jugar.</p>
+      </details>
+      <details class="faq-item">
+        <summary>¿Cómo sé que los resultados son reales?</summary>
+        <p>Cada apuesta queda registrada en esta misma página tal cual sucedió — incluyendo las que perdemos. No editamos ni borramos nada del historial, a diferencia de la mayoría de tipsters.</p>
+      </details>
+      <details class="faq-item">
+        <summary>¿Qué pasa si pierdo mi dinero siguiendo un pick?</summary>
+        <p>Ningún pick tiene 100% de certeza — las apuestas deportivas conllevan riesgo real. Nunca apuestes más de lo que puedas permitirte perder. En Golden Bankroll, la Garantía Golden cubre la tarifa de reserva del servicio (no el capital apostado).</p>
+      </details>
+      <details class="faq-item">
+        <summary>¿Necesito experiencia previa para unirme?</summary>
+        <p>No. Explicamos cada pick con el detalle necesario, y en Golden Bankroll te acompañamos paso a paso aunque sea tu primera vez.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="glossary-section">
+    <h2>Glosario rápido de apuestas</h2>
+    <div class="glossary-list">
+      <div class="glossary-item"><strong>Cuota</strong><span>El número que multiplica tu stake si ganas. Una cuota de 1.50 convierte S/10 en S/15.</span></div>
+      <div class="glossary-item"><strong>Bet Builder</strong><span>Una apuesta combinada dentro de un mismo partido (ej. "gana + más de 2.5 goles") con una sola cuota conjunta.</span></div>
+      <div class="glossary-item"><strong>Hándicap asiático</strong><span>Una ventaja o desventaja de goles que se le da a un equipo antes de empezar, para equilibrar la cuota.</span></div>
+      <div class="glossary-item"><strong>Cash out</strong><span>Retirar una apuesta antes de que termine el partido, asegurando una ganancia o pérdida parcial en vez de esperar el resultado final.</span></div>
+      <div class="glossary-item"><strong>Doble oportunidad</strong><span>Cubrir dos de los tres resultados posibles de un partido (ej. "gana o empata") a cambio de una cuota más baja.</span></div>
+    </div>
+  </section>
+  </div>
+
+  <div id="dashboardContent" class="app-section" hidden>
   <nav class="tabs" role="tablist">
     <button class="tab is-active" data-view="free">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--free)" stroke="none"><circle cx="12" cy="12" r="9"/></svg>
@@ -1163,39 +1258,7 @@
       <div class="chart-wrap" style="height:260px;"><canvas id="chartVipFreq"></canvas></div>
     </div>
   </section>
-
-  <section class="faq-section">
-    <h2>Preguntas frecuentes</h2>
-    <div class="faq-list">
-      <details class="faq-item">
-        <summary>¿Es legal apostar deportivamente en Perú?</summary>
-        <p>Sí. Las apuestas deportivas son legales en Perú a través de casas de apuestas autorizadas (como Betano). Este sitio es de análisis y educación — tú decides en qué casa de apuestas jugar.</p>
-      </details>
-      <details class="faq-item">
-        <summary>¿Cómo sé que los resultados son reales?</summary>
-        <p>Cada apuesta queda registrada en esta misma página tal cual sucedió — incluyendo las que perdemos. No editamos ni borramos nada del historial, a diferencia de la mayoría de tipsters.</p>
-      </details>
-      <details class="faq-item">
-        <summary>¿Qué pasa si pierdo mi dinero siguiendo un pick?</summary>
-        <p>Ningún pick tiene 100% de certeza — las apuestas deportivas conllevan riesgo real. Nunca apuestes más de lo que puedas permitirte perder. En Golden Bankroll, la Garantía Golden cubre la tarifa de reserva del servicio (no el capital apostado).</p>
-      </details>
-      <details class="faq-item">
-        <summary>¿Necesito experiencia previa para unirme?</summary>
-        <p>No. Explicamos cada pick con el detalle necesario, y en Golden Bankroll te acompañamos paso a paso aunque sea tu primera vez.</p>
-      </details>
-    </div>
-  </section>
-
-  <section class="glossary-section">
-    <h2>Glosario rápido de apuestas</h2>
-    <div class="glossary-list">
-      <div class="glossary-item"><strong>Cuota</strong><span>El número que multiplica tu stake si ganas. Una cuota de 1.50 convierte S/10 en S/15.</span></div>
-      <div class="glossary-item"><strong>Bet Builder</strong><span>Una apuesta combinada dentro de un mismo partido (ej. "gana + más de 2.5 goles") con una sola cuota conjunta.</span></div>
-      <div class="glossary-item"><strong>Hándicap asiático</strong><span>Una ventaja o desventaja de goles que se le da a un equipo antes de empezar, para equilibrar la cuota.</span></div>
-      <div class="glossary-item"><strong>Cash out</strong><span>Retirar una apuesta antes de que termine el partido, asegurando una ganancia o pérdida parcial en vez de esperar el resultado final.</span></div>
-      <div class="glossary-item"><strong>Doble oportunidad</strong><span>Cubrir dos de los tres resultados posibles de un partido (ej. "gana o empata") a cambio de una cuota más baja.</span></div>
-    </div>
-  </section>
+  </div>
 
   <footer class="site-footer">
     <div class="site-footer__row">
@@ -3227,11 +3290,51 @@
     update();
   }
 
+  function goToSection(key){
+    document.getElementById('launcherScreen').hidden = true;
+    document.getElementById('backToMenuBar').hidden = false;
+    const landing = document.getElementById('landingContent');
+    const dashboard = document.getElementById('dashboardContent');
+    if (key === 'landing'){
+      landing.hidden = false;
+      dashboard.hidden = true;
+    } else {
+      landing.hidden = true;
+      dashboard.hidden = false;
+      const targetView = key === 'bankroll' ? 'vip' : key;
+      state.view = null;
+      switchView(targetView);
+      Object.values(state.charts).forEach(c => { try { c.resize(); } catch(e){} });
+      if (key === 'bankroll'){
+        const scrollToCard = () => {
+          const card = document.querySelector('.bankroll-card');
+          if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+        setTimeout(scrollToCard, 120);
+        setTimeout(scrollToCard, 500);
+      }
+    }
+    window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+  }
+
+  function backToMenu(){
+    document.getElementById('launcherScreen').hidden = false;
+    document.getElementById('backToMenuBar').hidden = true;
+    document.getElementById('landingContent').hidden = true;
+    document.getElementById('dashboardContent').hidden = true;
+    window.scrollTo({ top: 0 });
+  }
+
   function setupUI(){
     applyEntranceAnimations();
     setupScrollReveal();
     initCalculator();
     applyAdminGating();
+    document.querySelectorAll('[data-launch]').forEach(btn => {
+      btn.addEventListener('click', () => goToSection(btn.dataset.launch));
+    });
+    const btnBackToMenu = document.getElementById('btnBackToMenu');
+    if (btnBackToMenu) btnBackToMenu.addEventListener('click', backToMenu);
     document.querySelectorAll('#bankrollTiers .bankroll-tier').forEach(btn => {
       btn.addEventListener('click', () => {
         const tierKey = btn.dataset.tier;
@@ -3244,9 +3347,7 @@
     });
     document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchView(t.dataset.view)));
     document.querySelectorAll('[data-goto-view]').forEach(b => b.addEventListener('click', () => {
-      switchView(b.dataset.gotoView);
-      const nav = document.querySelector('.tabs');
-      if (nav) nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      goToSection(b.dataset.gotoView);
     }));
     document.querySelectorAll('.subtab').forEach(t => t.addEventListener('click', () => switchRetoView(t.dataset.retoView)));
     document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => goToReto(b.dataset.goto)));
