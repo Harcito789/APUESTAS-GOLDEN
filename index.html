@@ -166,29 +166,10 @@
   }
   .matches-live-badge__dot{ width:7px; height:7px; border-radius:50%; background:var(--success); animation: livePulse 1.6s ease-in-out infinite; }
   @keyframes livePulse{ 0%,100%{ opacity:1; box-shadow:0 0 0 0 rgba(52,199,126,.5);} 50%{ opacity:.6; box-shadow:0 0 0 5px rgba(52,199,126,0);} }
-  .matches-tabs{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:18px; }
-  .matches-tab{ background:var(--surface-2); border:1px solid var(--border); color:var(--text-dim); padding:7px 14px; border-radius:999px; font-size:12.5px; font-weight:600; cursor:pointer; }
-  .matches-tab.is-active{ background:var(--accent-soft); border-color:var(--accent-line); color:var(--accent-strong); }
-  .matches-list{ display:flex; flex-direction:column; gap:14px; max-width:760px; margin:0 auto; }
-  .matches-league-group{ display:flex; flex-direction:column; gap:8px; }
-  .matches-league-label{ font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.5px; font-weight:600; padding:0 4px; }
-  .match-card{
-    display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--border-soft);
-    border-radius:var(--radius-md); padding:14px 16px; transition: border-color .15s, transform .15s;
+  .matches-widget-card{
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border-soft); border-radius: var(--radius-lg);
+    padding: 4px; overflow: hidden; box-shadow: var(--shadow-md);
   }
-  .match-card:hover{ border-color: var(--accent-line); transform: translateY(-1px); }
-  .match-card__teams{ flex:1; display:flex; flex-direction:column; gap:6px; min-width:0; }
-  .match-card__team{ display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:13.5px; font-weight:600; color:var(--text); }
-  .match-card__team span:last-child{ font-family:var(--font-mono); color:var(--text-dim); font-weight:700; }
-  .match-card__meta{ flex:none; display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
-  .match-status{ font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px; text-transform:uppercase; letter-spacing:.4px; white-space:nowrap; }
-  .match-status--live{ background:var(--success-soft); color:var(--success); }
-  .match-status--scheduled{ background:var(--surface-3); color:var(--text-faint); }
-  .match-status--finished{ background:var(--cancel-soft); color:var(--cancel); }
-  .match-card__time{ font-size:11.5px; color:var(--text-faint); font-family:var(--font-mono); }
-  .matches-empty{ text-align:center; color:var(--text-faint); font-size:13.5px; padding:34px 20px; line-height:1.6; }
-  .matches-empty svg{ display:block; margin: 0 auto 10px; opacity:.5; }
-  .matches-updated{ text-align:center; font-size:11px; color:var(--text-faint); font-family:var(--font-mono); margin-top:14px; }
 
   .faq-section, .glossary-section{ margin: 8px 0 22px; }
   .faq-section h2, .glossary-section h2{ font-size: 22px; color: var(--text); margin-bottom: 16px; text-align: center; }
@@ -712,6 +693,24 @@
 
 </head>
 <body>
+<script type="module" src="https://widgets.api-sports.io/3.1.0/widgets.js"></script>
+<api-sports-widget
+  data-type="config"
+  data-key="ebdab3756e795fb110e4b81845b5e0db"
+  data-sport="football"
+  data-theme="dark"
+  data-lang="es"
+  data-timezone="America/Lima"
+  data-show-logos="false"
+></api-sports-widget>
+<script>
+  (function(){
+    var w = document.getElementById('matchesWidget');
+    if (!w) return;
+    var today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Lima' });
+    w.setAttribute('data-date', today);
+  })();
+</script>
 <div class="wrap" id="app">
   <header class="topbar">
     <div class="brand">
@@ -861,11 +860,13 @@
       <h2>Lo que se juega hoy</h2>
       <p>Marcadores y horarios de las ligas que cubrimos, actualizados automáticamente.</p>
     </div>
-    <div class="matches-tabs" id="matchesTabs"></div>
-    <div class="matches-list" id="matchesList">
-      <div class="matches-empty">Cargando partidos de hoy…</div>
+    <div class="matches-widget-card">
+      <api-sports-widget
+        id="matchesWidget"
+        data-type="games"
+        data-league="2-39-140-135-78-281-13-11-128-71-61-203-103"
+      ></api-sports-widget>
     </div>
-    <div class="matches-updated" id="matchesUpdated"></div>
   </section>
 
   <section class="faq-section">
@@ -3505,101 +3506,6 @@
   }
 
   boot();
-})();
-</script>
-
-<script>
-(function(){
-  const MATCHES_ENDPOINT = 'https://panel.bigoldenbet.com/matches.php';
-  const listEl = document.getElementById('matchesList');
-  const tabsEl = document.getElementById('matchesTabs');
-  const updatedEl = document.getElementById('matchesUpdated');
-  if (!listEl) return;
-
-  let allMatches = [];
-  let activeLeague = 'todas';
-
-  function esc(s){
-    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-
-  function renderTabs(leagues){
-    tabsEl.innerHTML = '';
-    if (leagues.length <= 1){ tabsEl.style.display = 'none'; return; }
-    tabsEl.style.display = 'flex';
-    const tabs = ['todas', ...leagues];
-    tabs.forEach(lg => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'matches-tab' + (lg === activeLeague ? ' is-active' : '');
-      b.textContent = lg === 'todas' ? 'Todas' : lg;
-      b.addEventListener('click', () => { activeLeague = lg; renderList(); renderTabs(leagues); });
-      tabsEl.appendChild(b);
-    });
-  }
-
-  function statusBadge(m){
-    if (m.status === 'live') return '<span class="match-status match-status--live">En vivo</span>';
-    if (m.status === 'finished') return '<span class="match-status match-status--finished">Finalizado</span>';
-    return '<span class="match-status match-status--scheduled">Programado</span>';
-  }
-
-  function renderList(){
-    const filtered = activeLeague === 'todas' ? allMatches : allMatches.filter(m => m.league === activeLeague);
-
-    if (!filtered.length){
-      listEl.innerHTML = `<div class="matches-empty">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-        Muy pronto vas a ver aquí los partidos de hoy, actualizados en vivo.
-      </div>`;
-      return;
-    }
-
-    const byLeague = {};
-    filtered.forEach(m => { (byLeague[m.league] = byLeague[m.league] || []).push(m); });
-
-    let html = '';
-    Object.keys(byLeague).forEach(lg => {
-      html += `<div class="matches-league-group"><div class="matches-league-label">${esc(lg)}</div>`;
-      byLeague[lg].forEach(m => {
-        const showScore = m.status !== 'scheduled';
-        html += `<div class="match-card">
-          <div class="match-card__teams">
-            <div class="match-card__team"><span>${esc(m.home)}</span><span>${showScore ? esc(m.homeScore) : ''}</span></div>
-            <div class="match-card__team"><span>${esc(m.away)}</span><span>${showScore ? esc(m.awayScore) : ''}</span></div>
-          </div>
-          <div class="match-card__meta">
-            ${statusBadge(m)}
-            <span class="match-card__time">${esc(m.status === 'live' && m.minute ? m.minute + "'" : (m.time || ''))}</span>
-          </div>
-        </div>`;
-      });
-      html += '</div>';
-    });
-    listEl.innerHTML = html;
-  }
-
-  function loadMatches(){
-    fetch(MATCHES_ENDPOINT, { cache: 'no-store' })
-      .then(r => r.json())
-      .then(data => {
-        allMatches = Array.isArray(data.matches) ? data.matches : [];
-        const leagues = [...new Set(allMatches.map(m => m.league))];
-        renderTabs(leagues);
-        renderList();
-        if (updatedEl) {
-          updatedEl.textContent = allMatches.length
-            ? 'Actualizado ' + new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })
-            : '';
-        }
-      })
-      .catch(() => {
-        listEl.innerHTML = '<div class="matches-empty">No pudimos cargar los partidos de hoy. Intenta de nuevo en unos minutos.</div>';
-      });
-  }
-
-  loadMatches();
-  setInterval(loadMatches, 90000);
 })();
 </script>
 
