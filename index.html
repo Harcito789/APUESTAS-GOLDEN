@@ -166,9 +166,34 @@
   }
   .matches-live-badge__dot{ width:7px; height:7px; border-radius:50%; background:var(--success); animation: livePulse 1.6s ease-in-out infinite; }
   @keyframes livePulse{ 0%,100%{ opacity:1; box-shadow:0 0 0 0 rgba(52,199,126,.5);} 50%{ opacity:.6; box-shadow:0 0 0 5px rgba(52,199,126,0);} }
-  .matches-widget-card{
-    background: rgba(255,255,255,0.03); border: 1px solid var(--border-soft); border-radius: var(--radius-lg);
-    padding: 4px; overflow: hidden; box-shadow: var(--shadow-md);
+  .matches-tabs{ display:flex; gap:8px; justify-content:center; margin-bottom:18px; }
+  .matches-tab{ background:var(--surface-2); border:1px solid var(--border); color:var(--text-dim); padding:7px 16px; border-radius:999px; font-size:12.5px; font-weight:600; cursor:pointer; }
+  .matches-tab.is-active{ background:var(--accent-soft); border-color:var(--accent-line); color:var(--accent-strong); }
+  .matches-card{
+    background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius-lg);
+    overflow: hidden; margin-bottom: 12px; box-shadow: var(--shadow-md);
+  }
+  .matches-league-head{ display:flex; align-items:center; gap:10px; padding:12px 16px; background: var(--surface-2); border-bottom:1px solid var(--border-soft); }
+  .matches-league-head img{ width:20px; height:20px; object-fit:contain; flex:none; }
+  .matches-league-head .name{ font-size:13.5px; font-weight:700; color:var(--text); }
+  .matches-league-head .round{ font-size:11px; color:var(--text-faint); margin-left:auto; white-space:nowrap; }
+  .match-row{ display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--border-soft); transition:background .12s; }
+  .match-row:last-child{ border-bottom:none; }
+  .match-row:hover{ background: var(--surface-2); }
+  .match-row__team{ flex:1; display:flex; align-items:center; gap:8px; min-width:0; font-size:13.5px; font-weight:600; color:var(--text); }
+  .match-row__team.away{ justify-content:flex-end; flex-direction:row-reverse; text-align:right; }
+  .match-row__team img{ width:22px; height:22px; object-fit:contain; flex:none; }
+  .match-row__team span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .match-row__center{ flex:none; width:84px; display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .match-row__score{ font-family:var(--font-mono); font-weight:700; font-size:15px; color:var(--text); }
+  .match-row__time{ font-family:var(--font-mono); font-size:12px; color:var(--text-faint); }
+  .match-row__status{ font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; padding:2px 7px; border-radius:999px; white-space:nowrap; }
+  .match-row__status--live{ background:var(--success-soft); color:var(--success); }
+  .match-row__status--finished{ background:var(--surface-3); color:var(--text-faint); }
+  .matches-empty{ text-align:center; color:var(--text-faint); font-size:13.5px; padding:34px 20px; line-height:1.6; }
+  .matches-updated{ text-align:center; font-size:11px; color:var(--text-faint); font-family:var(--font-mono); margin-top:14px; }
+  @media (max-width:560px){
+    .match-row__team span{ max-width:88px; }
   }
 
   .faq-section, .glossary-section{ margin: 8px 0 22px; }
@@ -693,24 +718,6 @@
 
 </head>
 <body>
-<script type="module" src="https://widgets.api-sports.io/3.1.0/widgets.js"></script>
-<api-sports-widget
-  data-type="config"
-  data-key="ebdab3756e795fb110e4b81845b5e0db"
-  data-sport="football"
-  data-theme="dark"
-  data-lang="es"
-  data-timezone="America/Lima"
-  data-show-logos="false"
-></api-sports-widget>
-<script>
-  (function(){
-    var w = document.getElementById('matchesWidget');
-    if (!w) return;
-    var today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Lima' });
-    w.setAttribute('data-date', today);
-  })();
-</script>
 <div class="wrap" id="app">
   <header class="topbar">
     <div class="brand">
@@ -860,13 +867,15 @@
       <h2>Lo que se juega hoy</h2>
       <p>Marcadores y horarios de las ligas que cubrimos, actualizados automáticamente.</p>
     </div>
-    <div class="matches-widget-card">
-      <api-sports-widget
-        id="matchesWidget"
-        data-type="games"
-        data-league="2-39-140-135-78-281-13-11-128-71-61-203-103"
-      ></api-sports-widget>
+    <div class="matches-tabs" id="matchesTabs">
+      <button type="button" class="matches-tab is-active" data-filter="todos">Todos</button>
+      <button type="button" class="matches-tab" data-filter="live">En vivo</button>
+      <button type="button" class="matches-tab" data-filter="finished">Finalizados</button>
     </div>
+    <div id="matchesList">
+      <div class="matches-empty">Cargando partidos de hoy…</div>
+    </div>
+    <div class="matches-updated" id="matchesUpdated"></div>
   </section>
 
   <section class="faq-section">
@@ -3506,6 +3515,116 @@
   }
 
   boot();
+})();
+</script>
+
+<script>
+(function(){
+  const MATCHES_ENDPOINT = 'https://panel.bigoldenbet.com/matches.php';
+  const listEl = document.getElementById('matchesList');
+  const tabsEl = document.getElementById('matchesTabs');
+  const updatedEl = document.getElementById('matchesUpdated');
+  if (!listEl) return;
+
+  let allMatches = [];
+  let activeFilter = 'todos';
+
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function statusBadge(m){
+    if (m.status === 'live') return `<span class="match-row__status match-row__status--live">En vivo</span>`;
+    if (m.status === 'finished') return `<span class="match-row__status match-row__status--finished">Final</span>`;
+    return '';
+  }
+
+  function centerInfo(m){
+    if (m.status === 'scheduled'){
+      return `<span class="match-row__time">${esc(m.time)}</span>`;
+    }
+    const score = `${m.homeScore ?? 0} - ${m.awayScore ?? 0}`;
+    const sub = m.status === 'live' && m.minute ? `${m.minute}'` : (m.status === 'finished' ? 'Final' : esc(m.time));
+    return `<span class="match-row__score">${score}</span><span class="match-row__time">${sub}</span>`;
+  }
+
+  function render(){
+    const filtered = activeFilter === 'todos' ? allMatches : allMatches.filter(m => m.status === activeFilter);
+
+    if (!filtered.length){
+      listEl.innerHTML = `<div class="matches-empty">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><br>
+        No hay partidos en esta categoría ahora mismo.
+      </div>`;
+      return;
+    }
+
+    const byLeague = [];
+    const index = {};
+    filtered.forEach(m => {
+      if (!(m.leagueId in index)){
+        index[m.leagueId] = { league: m.league, leagueLogo: m.leagueLogo, round: m.round, matches: [] };
+        byLeague.push(index[m.leagueId]);
+      }
+      index[m.leagueId].matches.push(m);
+    });
+
+    listEl.innerHTML = byLeague.map(group => `
+      <div class="matches-card">
+        <div class="matches-league-head">
+          <img src="${esc(group.leagueLogo)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
+          <span class="name">${esc(group.league)}</span>
+          <span class="round">${esc(group.round)}</span>
+        </div>
+        ${group.matches.map(m => `
+          <div class="match-row">
+            <div class="match-row__team home">
+              <img src="${esc(m.homeLogo)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
+              <span>${esc(m.home)}</span>
+            </div>
+            <div class="match-row__center">
+              ${statusBadge(m)}
+              ${centerInfo(m)}
+            </div>
+            <div class="match-row__team away">
+              <img src="${esc(m.awayLogo)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
+              <span>${esc(m.away)}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+  }
+
+  function loadMatches(){
+    fetch(MATCHES_ENDPOINT, { cache: 'no-store' })
+      .then(r => r.json())
+      .then(data => {
+        allMatches = Array.isArray(data.matches) ? data.matches : [];
+        render();
+        if (updatedEl){
+          updatedEl.textContent = allMatches.length
+            ? 'Actualizado ' + new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })
+            : '';
+        }
+      })
+      .catch(() => {
+        listEl.innerHTML = '<div class="matches-empty">No pudimos cargar los partidos de hoy. Intenta de nuevo en unos minutos.</div>';
+      });
+  }
+
+  if (tabsEl){
+    tabsEl.querySelectorAll('.matches-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeFilter = btn.dataset.filter;
+        tabsEl.querySelectorAll('.matches-tab').forEach(b => b.classList.toggle('is-active', b === btn));
+        render();
+      });
+    });
+  }
+
+  loadMatches();
+  setInterval(loadMatches, 60000);
 })();
 </script>
 
