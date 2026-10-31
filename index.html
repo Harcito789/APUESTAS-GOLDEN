@@ -180,11 +180,13 @@
   .match-row{ display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--border-soft); transition:background .12s; }
   .match-row:last-child{ border-bottom:none; }
   .match-row:hover{ background: var(--surface-2); }
-  .match-row__team{ flex:1; display:flex; align-items:center; gap:8px; min-width:0; font-size:13.5px; font-weight:600; color:var(--text); }
-  .match-row__team.away{ justify-content:flex-end; flex-direction:row-reverse; text-align:right; }
-  .match-row__team img{ width:22px; height:22px; object-fit:contain; flex:none; }
-  .match-row__team span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .match-row__center{ flex:none; width:84px; display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .match-row__team-name{ flex:1; min-width:0; font-size:13.5px; font-weight:600; color:var(--text); }
+  .match-row__team-name span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block; }
+  .match-row__team-name.home{ text-align:right; }
+  .match-row__team-name.away{ text-align:left; }
+  .match-row__center{ flex:none; display:flex; align-items:center; gap:10px; }
+  .match-row__logo{ width:24px; height:24px; object-fit:contain; flex:none; }
+  .match-row__score-block{ flex:none; min-width:58px; display:flex; flex-direction:column; align-items:center; gap:3px; }
   .match-row__score{ font-family:var(--font-mono); font-weight:700; font-size:15px; color:var(--text); }
   .match-row__time{ font-family:var(--font-mono); font-size:12px; color:var(--text-faint); }
   .match-row__status{ font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; padding:2px 7px; border-radius:999px; white-space:nowrap; }
@@ -193,7 +195,9 @@
   .matches-empty{ text-align:center; color:var(--text-faint); font-size:13.5px; padding:34px 20px; line-height:1.6; }
   .matches-updated{ text-align:center; font-size:11px; color:var(--text-faint); font-family:var(--font-mono); margin-top:14px; }
   @media (max-width:560px){
-    .match-row__team span{ max-width:88px; }
+    .match-row__team-name{ font-size:12.5px; }
+    .match-row__logo{ width:20px; height:20px; }
+    .match-row__center{ gap:6px; }
   }
 
   .faq-section, .glossary-section{ margin: 8px 0 22px; }
@@ -3578,18 +3582,16 @@
         </div>
         ${group.matches.map(m => `
           <div class="match-row">
-            <div class="match-row__team home">
-              <img src="${esc(m.homeLogo)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
-              <span>${esc(m.home)}</span>
-            </div>
+            <div class="match-row__team-name home"><span>${esc(m.home)}</span></div>
             <div class="match-row__center">
-              ${statusBadge(m)}
-              ${centerInfo(m)}
+              <img class="match-row__logo" src="${esc(m.homeLogo)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
+              <div class="match-row__score-block">
+                ${statusBadge(m)}
+                ${centerInfo(m)}
+              </div>
+              <img class="match-row__logo" src="${esc(m.awayLogo)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
             </div>
-            <div class="match-row__team away">
-              <img src="${esc(m.awayLogo)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
-              <span>${esc(m.away)}</span>
-            </div>
+            <div class="match-row__team-name away"><span>${esc(m.away)}</span></div>
           </div>
         `).join('')}
       </div>
