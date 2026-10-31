@@ -469,6 +469,39 @@
   .free-banner__icon{ flex: none; width: 44px; height: 44px; }
   .free-banner__text h2{ font-size: 22px; color: var(--free-strong); letter-spacing: .5px; }
   .free-banner__text p{ font-size: 12.5px; color: var(--text-dim); margin-top: 4px; font-family: var(--font-mono); letter-spacing: .3px; }
+
+  .free-pick-card{
+    background: linear-gradient(160deg, rgba(111,168,220,0.08), var(--surface) 55%); border: 1px solid var(--free-line);
+    border-radius: var(--radius-lg); padding: 20px 22px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .free-pick-card__top{ display:flex; align-items:center; gap:10px; }
+  .free-pick-card__avatar{
+    width:36px; height:36px; border-radius:50%; background:var(--free-soft); border:1px solid var(--free-line);
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .free-pick-card__sender{ font-size:13px; font-weight:700; color:var(--text); }
+  .free-pick-card__time{ font-size:11.5px; color:var(--text-faint); font-family:var(--font-mono); }
+  .free-pick-card__match{ font-size:16px; font-weight:700; color:var(--text); margin-top:4px; }
+  .free-pick-card__pick{ font-size:13.5px; color:var(--text-dim); line-height:1.5; }
+  .free-pick-card__meta{ display:flex; gap:16px; flex-wrap:wrap; margin-top:6px; padding-top:12px; border-top:1px solid var(--border-soft); }
+  .free-pick-card__meta .m{ display:flex; flex-direction:column; gap:2px; }
+  .free-pick-card__meta .m .l{ font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.4px; }
+  .free-pick-card__meta .m .v{ font-family:var(--font-mono); font-weight:700; font-size:14.5px; color:var(--free-strong); }
+
+  .free-lists{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; }
+  .free-list-card{ background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius-lg); padding:18px; }
+  .free-list-card.is-golden{ border-color:var(--gold-line); background:linear-gradient(160deg, rgba(240,201,74,0.06), var(--surface) 60%); }
+  .free-list-card.is-black{ border-color:rgba(242,73,95,0.3); background:linear-gradient(160deg, rgba(242,73,95,0.05), var(--surface) 60%); }
+  .free-list-card__head{ display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+  .free-list-card__head h3{ font-size:14.5px; color:var(--text); }
+  .free-list-card__hint{ font-size:11px; color:var(--text-faint); width:100%; margin-left:26px; }
+  .free-list-item{ display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border-soft); font-size:13px; }
+  .free-list-item:last-child{ border-bottom:none; }
+  .free-list-empty{ font-size:12.5px; color:var(--text-faint); line-height:1.6; }
+
+  .free-history-label{ display:flex; align-items:center; gap:12px; margin-top:8px; }
+  .free-history-label span{ font-family:var(--font-mono); font-size:11px; letter-spacing:1.2px; text-transform:uppercase; color:var(--text-faint); white-space:nowrap; }
+  .free-history-label::after{ content:''; flex:1; height:1px; background:var(--border-soft); }
   .metric--free .metric__value{ color: var(--free-strong); }
   .btn-free{ background: linear-gradient(90deg, var(--free), var(--free-strong)); border-color: var(--free-line); color: #0A1A28; }
   .btn-free:hover{ background: var(--free-strong); }
@@ -956,6 +989,35 @@
         <h2>GRUPO FREE</h2>
         <p>PICKS GRATUITOS · REGISTRO Y ESTADÍSTICAS</p>
       </div>
+    </div>
+
+    <div class="free-pick-card" id="freePickCard"></div>
+
+    <div class="free-lists">
+      <div class="free-list-card is-golden">
+        <div class="free-list-card__head">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold-strong)" stroke-width="1.8"><path d="M12 2l2.4 6.9L21 9l-5.5 4.6L17 21l-5-3.6L7 21l1.5-7.4L3 9l6.6-.1z"/></svg>
+          <h3>Lista Dorada</h3>
+          <span class="free-list-card__hint">Equipos en buena racha</span>
+        </div>
+        <div class="free-list-card__body">
+          <div class="free-list-empty">En seguimiento esta semana — pronto vas a ver aquí los equipos que vienen ganando.</div>
+        </div>
+      </div>
+      <div class="free-list-card is-black">
+        <div class="free-list-card__head">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 8l8 8M16 8l-8 8"/></svg>
+          <h3>Lista Negra</h3>
+          <span class="free-list-card__hint">Equipos a evitar por ahora</span>
+        </div>
+        <div class="free-list-card__body">
+          <div class="free-list-empty">En seguimiento esta semana — equipos que fallaron recientemente aparecerán aquí.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="free-history-label">
+      <span>Historial completo</span>
     </div>
 
     <div class="metrics" id="freeMetrics"></div>
@@ -2633,6 +2695,33 @@
     }).join('');
   }
 
+  function renderFreePickCard(){
+    const el = document.getElementById('freePickCard');
+    if (!el) return;
+    const bets = state.freeBets.slice().sort((a, b) => {
+      if (a.fecha !== b.fecha) return a.fecha < b.fecha ? 1 : -1;
+      return b.id - a.id;
+    });
+    const latest = bets[0];
+    if (!latest){
+      el.innerHTML = '<div class="free-list-empty">Aún no hay picks enviados al Grupo Free.</div>';
+      return;
+    }
+    const d = computeBetDerived(latest);
+    el.innerHTML =
+      '<div class="free-pick-card__top">' +
+        '<div class="free-pick-card__avatar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--free-strong)" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>' +
+        '<div><div class="free-pick-card__sender">Mi pick de hoy</div><div class="free-pick-card__time">Enviado el ' + esc(formatDateDisplay(latest.fecha)) + '</div></div>' +
+      '</div>' +
+      '<div class="free-pick-card__match">' + esc(latest.partido) + '</div>' +
+      '<div class="free-pick-card__pick">' + esc(latest.pick) + '</div>' +
+      '<div class="free-pick-card__meta">' +
+        '<div class="m"><span class="l">Stake</span><span class="v">' + formatMoney(d.stakeCents) + '</span></div>' +
+        '<div class="m"><span class="l">Cuota</span><span class="v">' + formatCuota(latest.cuota) + '</span></div>' +
+        '<div class="m"><span class="l">Estado</span><span class="v">' + betEstadoPill(latest.estado) + '</span></div>' +
+      '</div>';
+  }
+
   function renderGroupWeeklyStats(group){
     const period = state.betPeriod[group.key];
     const rows = computePeriodBetStats(group.arrayKey, period);
@@ -2866,6 +2955,7 @@
       renderGroupWeeklyStats(group);
       renderGroupCharts(group);
     });
+    renderFreePickCard();
   }
 
   /* =====================================================================
