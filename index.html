@@ -192,6 +192,25 @@
   .match-row__status{ font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; padding:2px 7px; border-radius:999px; white-space:nowrap; }
   .match-row__status--live{ background:var(--success-soft); color:var(--success); }
   .match-row__status--finished{ background:var(--surface-3); color:var(--text-faint); }
+  .match-row[data-clickable]{ cursor:pointer; }
+  .stat-matchup__head{ display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:22px; }
+  .stat-matchup__team{ display:flex; flex-direction:column; align-items:center; gap:6px; flex:1; min-width:0; }
+  .stat-matchup__team img{ width:38px; height:38px; object-fit:contain; }
+  .stat-matchup__team span{ font-size:12.5px; font-weight:600; color:var(--text); text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:120px; }
+  .stat-matchup__score{ font-family:var(--font-mono); font-weight:700; font-size:22px; color:var(--gold-strong); flex:none; }
+  .stat-possession{ margin-bottom:22px; }
+  .stat-possession__labels{ display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:12.5px; color:var(--text-dim); margin-bottom:6px; }
+  .stat-possession__bar{ display:flex; height:8px; border-radius:999px; overflow:hidden; background:var(--surface-2); }
+  .stat-possession__bar span{ height:100%; }
+  .stat-row{ display:grid; grid-template-columns:48px 1fr 48px; align-items:center; gap:10px; font-size:13px; padding:8px 0; border-bottom:1px solid var(--border-soft); }
+  .stat-row:last-child{ border-bottom:none; }
+  .stat-row__val{ font-family:var(--font-mono); font-weight:700; color:var(--text); text-align:center; }
+  .stat-row__label{ text-align:center; color:var(--text-faint); font-size:11.5px; text-transform:uppercase; letter-spacing:.4px; }
+  .stat-events{ margin-top:22px; display:flex; flex-direction:column; gap:10px; }
+  .stat-events h4{ font-size:13px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.4px; margin-bottom:4px; }
+  .stat-event{ display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text); }
+  .stat-event__min{ font-family:var(--font-mono); color:var(--text-faint); width:34px; flex:none; }
+  .stat-event__icon{ flex:none; }
   .matches-empty{ text-align:center; color:var(--text-faint); font-size:13.5px; padding:34px 20px; line-height:1.6; }
   .matches-updated{ text-align:center; font-size:11px; color:var(--text-faint); font-family:var(--font-mono); margin-top:14px; }
   @media (max-width:560px){
@@ -1394,6 +1413,21 @@
 </a>
 
 <div class="toasts" id="toasts"></div>
+
+<!-- ---------- Match Stats Modal ---------- -->
+<div class="modal-backdrop" id="matchStatsModalBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="matchStatsModalTitle">
+    <div class="modal__head">
+      <h3 id="matchStatsModalTitle">Estadísticas del partido</h3>
+      <button class="modal-close" data-close-modal="matchStatsModalBackdrop" aria-label="Cerrar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" id="matchStatsModalBody">
+      <div class="matches-empty">Cargando estadísticas…</div>
+    </div>
+  </div>
+</div>
 
 <!-- ---------- Step Modal ---------- -->
 <div class="modal-backdrop" id="stepModalBackdrop">
@@ -3580,8 +3614,10 @@
           <span class="name">${esc(group.league)}</span>
           <span class="round">${esc(group.round)}</span>
         </div>
-        ${group.matches.map(m => `
-          <div class="match-row">
+        ${group.matches.map(m => {
+          const clickable = m.status !== 'scheduled';
+          return `
+          <div class="match-row" ${clickable ? `data-clickable data-fixture="${m.fixtureId}" data-home="${esc(m.home)}" data-away="${esc(m.away)}" data-home-logo="${esc(m.homeLogo)}" data-away-logo="${esc(m.awayLogo)}" data-home-score="${m.homeScore ?? 0}" data-away-score="${m.awayScore ?? 0}"` : ''}>
             <div class="match-row__team-name home"><span>${esc(m.home)}</span></div>
             <div class="match-row__center">
               <img class="match-row__logo" src="${esc(m.homeLogo)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
@@ -3593,7 +3629,7 @@
             </div>
             <div class="match-row__team-name away"><span>${esc(m.away)}</span></div>
           </div>
-        `).join('')}
+        `;}).join('')}
       </div>
     `).join('');
   }
@@ -3624,6 +3660,104 @@
       });
     });
   }
+
+  const statStatLabels = {
+    'Total Shots': 'Remates',
+    'Shots on Goal': 'A puerta',
+    'Corner Kicks': 'Córners',
+    'Fouls': 'Faltas',
+    'Yellow Cards': 'T. amarillas',
+    'Red Cards': 'T. rojas'
+  };
+
+  function eventIcon(type, detail){
+    if (type === 'Goal' && detail !== 'Missed Penalty') return '⚽';
+    if (type === 'Goal') return '❌';
+    if (detail === 'Red Card') return '🟥';
+    return '🟨';
+  }
+
+  function openMatchStats(el){
+    const body = document.getElementById('matchStatsModalBody');
+    const title = document.getElementById('matchStatsModalTitle');
+    title.textContent = `${el.dataset.home} vs ${el.dataset.away}`;
+
+    body.innerHTML = `
+      <div class="stat-matchup__head">
+        <div class="stat-matchup__team"><img src="${esc(el.dataset.homeLogo)}" alt=""><span>${esc(el.dataset.home)}</span></div>
+        <div class="stat-matchup__score">${el.dataset.homeScore} - ${el.dataset.awayScore}</div>
+        <div class="stat-matchup__team"><img src="${esc(el.dataset.awayLogo)}" alt=""><span>${esc(el.dataset.away)}</span></div>
+      </div>
+      <div class="matches-empty">Cargando estadísticas…</div>
+    `;
+    openModal('matchStatsModalBackdrop');
+
+    fetch(`${MATCHES_ENDPOINT}?fixture=${el.dataset.fixture}`, { cache: 'no-store' })
+      .then(r => r.json())
+      .then(data => {
+        const stats = Array.isArray(data.stats) ? data.stats : [];
+        const events = Array.isArray(data.events) ? data.events : [];
+
+        let statsHtml = '';
+        if (stats.length === 2){
+          const [h, a] = stats;
+          const poss = (type => {
+            const hs = h.stats.find(s => s.type === 'Ball Possession');
+            const as = a.stats.find(s => s.type === 'Ball Possession');
+            return { h: hs ? parseInt(hs.value) : 50, a: as ? parseInt(as.value) : 50 };
+          })();
+          statsHtml += `
+            <div class="stat-possession">
+              <div class="stat-possession__labels"><span>${poss.h}%</span><span>Posesión</span><span>${poss.a}%</span></div>
+              <div class="stat-possession__bar"><span style="width:${poss.h}%; background:var(--gold);"></span><span style="width:${poss.a}%; background:var(--surface-3);"></span></div>
+            </div>
+          `;
+          Object.keys(statStatLabels).forEach(key => {
+            const hv = h.stats.find(s => s.type === key);
+            const av = a.stats.find(s => s.type === key);
+            if (!hv && !av) return;
+            statsHtml += `
+              <div class="stat-row">
+                <span class="stat-row__val">${hv ? esc(hv.value) : '0'}</span>
+                <span class="stat-row__label">${statStatLabels[key]}</span>
+                <span class="stat-row__val">${av ? esc(av.value) : '0'}</span>
+              </div>
+            `;
+          });
+        } else {
+          statsHtml = '<div class="matches-empty">Estadísticas aún no disponibles para este partido.</div>';
+        }
+
+        let eventsHtml = '';
+        if (events.length){
+          eventsHtml = `<div class="stat-events"><h4>Jugadas clave</h4>` + events.map(ev => `
+            <div class="stat-event">
+              <span class="stat-event__min">${ev.minute}${ev.extra ? '+' + ev.extra : ''}'</span>
+              <span class="stat-event__icon">${eventIcon(ev.type, ev.detail)}</span>
+              <span>${esc(ev.player)} <span style="color:var(--text-faint);">(${esc(ev.team)})</span></span>
+            </div>
+          `).join('') + `</div>`;
+        }
+
+        body.innerHTML = `
+          <div class="stat-matchup__head">
+            <div class="stat-matchup__team"><img src="${esc(el.dataset.homeLogo)}" alt=""><span>${esc(el.dataset.home)}</span></div>
+            <div class="stat-matchup__score">${el.dataset.homeScore} - ${el.dataset.awayScore}</div>
+            <div class="stat-matchup__team"><img src="${esc(el.dataset.awayLogo)}" alt=""><span>${esc(el.dataset.away)}</span></div>
+          </div>
+          ${statsHtml}
+          ${eventsHtml}
+        `;
+      })
+      .catch(() => {
+        body.innerHTML += '<div class="matches-empty">No pudimos cargar las estadísticas. Intenta de nuevo.</div>';
+      });
+  }
+
+  listEl.addEventListener('click', e => {
+    const row = e.target.closest('[data-clickable]');
+    if (row) openMatchStats(row);
+  });
 
   loadMatches();
   setInterval(loadMatches, 60000);
