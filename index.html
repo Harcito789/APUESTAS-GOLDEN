@@ -3690,7 +3690,7 @@
       </div>
       <div class="matches-empty">Cargando estadísticas…</div>
     `;
-    openModal('matchStatsModalBackdrop');
+    document.getElementById('matchStatsModalBackdrop').classList.add('is-open');
 
     fetch(`${MATCHES_ENDPOINT}?fixture=${el.dataset.fixture}`, { cache: 'no-store' })
       .then(r => r.json())
