@@ -309,6 +309,65 @@
     .intro-overlay__ghost{ font-size:min(55vw,260px); }
   }
 
+  /* ---------- Panel promo (Mi Panel) ---------- */
+  .panel-promo{
+    position:relative; overflow:hidden; background:#05070A; border-radius:var(--radius-lg);
+    padding:56px 24px 0; margin-bottom:22px; border:1px solid var(--border-soft);
+  }
+  .panel-promo__stars{ position:absolute; inset:0; z-index:0; opacity:.5; }
+  .panel-promo__glow{
+    position:absolute; top:-220px; left:50%; transform:translateX(-50%); width:900px; height:440px;
+    background:radial-gradient(ellipse at center, rgba(240,201,74,0.16), transparent 70%); pointer-events:none;
+  }
+  .panel-promo__content{ position:relative; z-index:1; text-align:center; max-width:620px; margin:0 auto 40px; }
+  .panel-promo__title{ font-family:var(--font-display); font-weight:800; font-size:clamp(26px,4.3vw,44px); color:var(--text); line-height:1.16; margin:14px 0 16px; text-wrap:balance; }
+  .panel-promo__title span{ background:linear-gradient(90deg,var(--gold-strong),var(--gold)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .panel-promo__sub{ font-size:14.5px; color:var(--text-dim); line-height:1.6; margin-bottom:26px; }
+  .panel-promo__cta{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+
+  .panel-promo__mock{
+    position:relative; z-index:1; max-width:860px; margin:0 auto; border-radius:18px 18px 0 0;
+    background:var(--surface); border:1px solid var(--gold-line); border-bottom:none;
+    box-shadow:0 -30px 70px -30px rgba(240,201,74,0.18); overflow:hidden;
+    opacity:0; transform:translateY(36px);
+  }
+  .panel-promo__mock::before{
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, transparent, var(--gold), transparent); background-size:220% 100%; background-position:-60% 0;
+  }
+  .panel-promo.is-visible .panel-promo__mock::before{ animation: panelBeam 2.6s ease-in-out infinite; }
+  @keyframes panelBeam{ 0%{ background-position:-60% 0; } 100%{ background-position:160% 0; } }
+  .panel-promo.is-visible .panel-promo__mock{ animation: mockRise .8s cubic-bezier(.2,.8,.2,1) .25s forwards; }
+  @keyframes mockRise{ to{ opacity:1; transform:translateY(0); } }
+
+  .panel-mock__badge{
+    position:absolute; top:14px; right:16px; z-index:2; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.5px;
+    text-transform:uppercase; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border);
+    border-radius:999px; padding:4px 10px;
+  }
+  .panel-mock__head{ display:flex; align-items:center; gap:8px; padding:16px 20px 14px; border-bottom:1px solid var(--border-soft); }
+  .panel-mock__dots{ display:flex; gap:5px; }
+  .panel-mock__dots span{ width:8px; height:8px; border-radius:50%; background:var(--border); }
+  .panel-mock__head-title{ font-size:12.5px; color:var(--text-dim); font-family:var(--font-mono); margin-left:6px; }
+  .panel-mock__stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:0; }
+  .panel-mock__stat{ padding:18px 20px; border-right:1px solid var(--border-soft); border-bottom:1px solid var(--border-soft); }
+  .panel-mock__stat:last-child{ border-right:none; }
+  .panel-mock__stat .l{ font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.4px; margin-bottom:5px; }
+  .panel-mock__stat .v{ font-family:var(--font-mono); font-weight:700; font-size:18px; color:var(--gold-strong); }
+  .panel-mock__progress{ padding:16px 20px; border-bottom:1px solid var(--border-soft); }
+  .panel-mock__progress-label{ display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-dim); margin-bottom:6px; }
+  .panel-mock__bar-bg{ height:7px; border-radius:999px; background:var(--surface-2); overflow:hidden; }
+  .panel-mock__bar-fill{ height:100%; width:62%; border-radius:999px; background:linear-gradient(90deg,var(--gold),var(--success)); }
+  .panel-mock__rows{ padding:4px 20px 20px; }
+  .panel-mock__row{ display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--border-soft); font-size:12.5px; }
+  .panel-mock__row:last-child{ border-bottom:none; }
+  .panel-mock__row .desc{ color:var(--text-dim); }
+  .panel-mock__row .amt{ font-family:var(--font-mono); font-weight:700; }
+  .panel-mock__row .amt.up{ color:var(--success); }
+  @media (max-width:640px){
+    .panel-mock__stats{ grid-template-columns:repeat(2,1fr); }
+  }
+
   .wrap{ max-width: 1180px; margin: 0 auto; padding: 20px 20px 64px; }
 
   /* ---------- Header ---------- */
@@ -919,6 +978,42 @@
       </div>
     </div>
     <div class="hero__stats" id="heroStats"></div>
+  </section>
+
+  <section class="panel-promo" id="panelPromo">
+    <canvas class="panel-promo__stars" id="panelPromoStars"></canvas>
+    <div class="panel-promo__glow"></div>
+    <div class="panel-promo__content">
+      <span class="hero__eyebrow">Tu progreso, en vivo</span>
+      <h2 class="panel-promo__title">Sigue tu capital y tus picks en <span>Mi Panel</span></h2>
+      <p class="panel-promo__sub">Capital, balance, progreso hacia tu meta y cada movimiento — en un panel personal que se actualiza solo. Gratis al registrarte.</p>
+      <div class="panel-promo__cta">
+        <a class="btn btn-gold btn-lg" href="https://panel.bigoldenbet.com/register.php" target="_blank" rel="noopener">Crear mi cuenta gratis →</a>
+        <a class="btn btn-ghost btn-lg" href="https://panel.bigoldenbet.com/login.php" target="_blank" rel="noopener">Ya tengo cuenta</a>
+      </div>
+    </div>
+    <div class="panel-promo__mock">
+      <span class="panel-mock__badge">Vista de ejemplo</span>
+      <div class="panel-mock__head">
+        <div class="panel-mock__dots"><span></span><span></span><span></span></div>
+        <div class="panel-mock__head-title">panel.bigoldenbet.com — Reto 1K</div>
+      </div>
+      <div class="panel-mock__stats">
+        <div class="panel-mock__stat enter" style="--i:0"><div class="l">Capital inicial</div><div class="v">S/ 5.00</div></div>
+        <div class="panel-mock__stat enter" style="--i:1"><div class="l">Balance actual</div><div class="v">S/ 612.40</div></div>
+        <div class="panel-mock__stat enter" style="--i:2"><div class="l">Meta (x200)</div><div class="v">S/ 1,000</div></div>
+        <div class="panel-mock__stat enter" style="--i:3"><div class="l">Tasa de éxito</div><div class="v">78%</div></div>
+      </div>
+      <div class="panel-mock__progress enter" style="--i:4">
+        <div class="panel-mock__progress-label"><span>Progreso hacia la meta</span><span>62%</span></div>
+        <div class="panel-mock__bar-bg"><div class="panel-mock__bar-fill"></div></div>
+      </div>
+      <div class="panel-mock__rows">
+        <div class="panel-mock__row enter" style="--i:5"><span class="desc">Paso 14 — Bet Builder cuota 1.24</span><span class="amt up">+S/ 41.20</span></div>
+        <div class="panel-mock__row enter" style="--i:6"><span class="desc">Paso 13 — Combinada cuota 1.19</span><span class="amt up">+S/ 36.80</span></div>
+        <div class="panel-mock__row enter" style="--i:7"><span class="desc">Paso 12 — Doble cuota 1.21</span><span class="amt up">+S/ 30.95</span></div>
+      </div>
+    </div>
   </section>
 
   <section class="calc-card">
@@ -3924,6 +4019,53 @@
 
   loadMatches();
   setInterval(loadMatches, 60000);
+})();
+</script>
+
+<script>
+(function(){
+  var section = document.getElementById('panelPromo');
+  var canvas = document.getElementById('panelPromoStars');
+  if (!section || !canvas) return;
+
+  function drawStars(){
+    var dpr = window.devicePixelRatio || 1;
+    var w = section.clientWidth, h = section.clientHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+    var count = Math.round((w * h) / 9000);
+    for (var i = 0; i < count; i++){
+      var x = Math.random() * w, y = Math.random() * h;
+      var r = Math.random() * 1.1 + 0.2;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(235,241,245,' + (Math.random() * 0.5 + 0.15) + ')';
+      ctx.fill();
+    }
+  }
+
+  drawStars();
+  window.addEventListener('resize', drawStars);
+
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion){
+    section.classList.add('is-visible');
+  } else if ('IntersectionObserver' in window){
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          section.classList.add('is-visible');
+          obs.disconnect();
+        }
+      });
+    }, { threshold: 0.3 });
+    obs.observe(section);
+  } else {
+    section.classList.add('is-visible');
+  }
 })();
 </script>
 
