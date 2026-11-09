@@ -153,7 +153,10 @@
   .league-chip{
     background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim);
     padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: border-color .15s, color .15s, background .15s;
   }
+  .league-chip:hover{ border-color: var(--accent-line); color: var(--text); }
+  .league-chip.is-active{ background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent-strong); }
 
   .matches-section{ margin-bottom: 22px; }
   .matches-section__head{ text-align: center; max-width: 640px; margin: 0 auto 20px; }
@@ -167,6 +170,15 @@
   .matches-live-badge__dot{ width:7px; height:7px; border-radius:50%; background:var(--success); animation: livePulse 1.6s ease-in-out infinite; }
   @keyframes livePulse{ 0%,100%{ opacity:1; box-shadow:0 0 0 0 rgba(52,199,126,.5);} 50%{ opacity:.6; box-shadow:0 0 0 5px rgba(52,199,126,0);} }
   .matches-tabs{ display:flex; gap:8px; justify-content:center; margin-bottom:18px; }
+  .league-filter-badge{
+    display:flex; align-items:center; justify-content:center; gap:8px; font-size:12.5px; color:var(--text-dim);
+    margin:-6px 0 16px;
+  }
+  .league-filter-badge strong{ color:var(--accent-strong); }
+  .league-filter-badge button{
+    background:none; border:none; color:var(--text-faint); font-size:12px; cursor:pointer; text-decoration:underline; font-family:inherit;
+  }
+  .league-filter-badge button:hover{ color:var(--text); }
   .matches-tab{ background:var(--surface-2); border:1px solid var(--border); color:var(--text-dim); padding:7px 16px; border-radius:999px; font-size:12.5px; font-weight:600; cursor:pointer; }
   .matches-tab.is-active{ background:var(--accent-soft); border-color:var(--accent-line); color:var(--accent-strong); }
   .matches-card{
@@ -1126,18 +1138,19 @@
 
   <section class="leagues-section">
     <h2>Ligas que cubrimos</h2>
-    <div class="leagues-grid">
-      <span class="league-chip">Champions League</span>
-      <span class="league-chip">Premier League</span>
-      <span class="league-chip">La Liga</span>
-      <span class="league-chip">Serie A</span>
-      <span class="league-chip">Bundesliga</span>
-      <span class="league-chip">Liga 1 Perú</span>
-      <span class="league-chip">Copa Libertadores</span>
-      <span class="league-chip">Liga Argentina</span>
-      <span class="league-chip">Brasileirao</span>
-      <span class="league-chip">Eliminatorias CONMEBOL</span>
-      <span class="league-chip">Y más...</span>
+    <p style="font-size:13px; color:var(--text-dim); margin:-10px 0 16px;">Tocá una liga para ver solo sus partidos de hoy.</p>
+    <div class="leagues-grid" id="leaguesGrid">
+      <button type="button" class="league-chip is-active" data-league-id="all">Todas</button>
+      <button type="button" class="league-chip" data-league-id="2">Champions League</button>
+      <button type="button" class="league-chip" data-league-id="39">Premier League</button>
+      <button type="button" class="league-chip" data-league-id="140">La Liga</button>
+      <button type="button" class="league-chip" data-league-id="135">Serie A</button>
+      <button type="button" class="league-chip" data-league-id="78">Bundesliga</button>
+      <button type="button" class="league-chip" data-league-id="281">Liga 1 Perú</button>
+      <button type="button" class="league-chip" data-league-id="13">Copa Libertadores</button>
+      <button type="button" class="league-chip" data-league-id="11">Copa Sudamericana</button>
+      <button type="button" class="league-chip" data-league-id="128">Liga Argentina</button>
+      <button type="button" class="league-chip" data-league-id="71">Brasileirao</button>
     </div>
   </section>
 
@@ -1151,6 +1164,10 @@
       <button type="button" class="matches-tab is-active" data-filter="todos">Todos</button>
       <button type="button" class="matches-tab" data-filter="live">En vivo</button>
       <button type="button" class="matches-tab" data-filter="finished">Finalizados</button>
+    </div>
+    <div id="leagueFilterBadge" class="league-filter-badge" hidden>
+      Filtrando: <strong id="leagueFilterBadgeName"></strong>
+      <button type="button" id="leagueFilterClear">Quitar filtro ✕</button>
     </div>
     <div id="matchesList">
       <div class="matches-empty">Cargando partidos de hoy…</div>
@@ -3929,6 +3946,7 @@
 
   let allMatches = [];
   let activeFilter = 'todos';
+  let activeLeague = 'all';
 
   function esc(s){
     return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -3950,12 +3968,13 @@
   }
 
   function render(){
-    const filtered = activeFilter === 'todos' ? allMatches : allMatches.filter(m => m.status === activeFilter);
+    let filtered = activeFilter === 'todos' ? allMatches : allMatches.filter(m => m.status === activeFilter);
+    if (activeLeague !== 'all') filtered = filtered.filter(m => String(m.leagueId) === activeLeague);
 
     if (!filtered.length){
       listEl.innerHTML = `<div class="matches-empty">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><br>
-        No hay partidos en esta categoría ahora mismo.
+        No hay partidos de esta liga en esta categoría ahora mismo.
       </div>`;
       return;
     }
@@ -4022,6 +4041,36 @@
         render();
       });
     });
+  }
+
+  const leaguesGridEl = document.getElementById('leaguesGrid');
+  const filterBadgeEl = document.getElementById('leagueFilterBadge');
+  const filterBadgeNameEl = document.getElementById('leagueFilterBadgeName');
+  const filterClearBtn = document.getElementById('leagueFilterClear');
+
+  function setActiveLeague(id, label){
+    activeLeague = id;
+    if (leaguesGridEl){
+      leaguesGridEl.querySelectorAll('.league-chip').forEach(b => b.classList.toggle('is-active', b.dataset.leagueId === id));
+    }
+    if (filterBadgeEl){
+      filterBadgeEl.hidden = (id === 'all');
+      if (filterBadgeNameEl) filterBadgeNameEl.textContent = label || '';
+    }
+    render();
+  }
+
+  if (leaguesGridEl){
+    leaguesGridEl.querySelectorAll('.league-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        setActiveLeague(btn.dataset.leagueId, btn.textContent.trim());
+        const section = document.querySelector('.matches-section');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }
+  if (filterClearBtn){
+    filterClearBtn.addEventListener('click', () => setActiveLeague('all', ''));
   }
 
   const statStatLabels = {
