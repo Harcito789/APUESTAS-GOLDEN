@@ -243,11 +243,11 @@
   .launcher-screen[hidden], .back-to-menu[hidden]{ display: none !important; }
   .launcher-screen{
     display: flex; flex-direction: column; align-items: center; text-align: center;
-    padding: 60px 20px 40px; gap: 6px;
+    padding: 36px 20px 18px; gap: 6px;
   }
   .launcher-screen__star{ margin-bottom: 10px; }
-  .launcher-screen__title{ font-size: 28px; color: var(--text); }
-  .launcher-screen__sub{ font-size: 14px; color: var(--text-dim); margin-bottom: 28px; }
+  .launcher-screen__title{ font-size: 20px; color: var(--text); }
+  .launcher-screen__sub{ font-size: 13px; color: var(--text-dim); margin-bottom: 22px; }
   .launcher-grid{ display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; width: 100%; max-width: 900px; }
   .launcher-card{
     background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius-lg);
@@ -747,13 +747,22 @@
   }
   .hero__text{ flex:1 1 380px; min-width:280px; }
   .hero__eyebrow{
-    display:inline-block; font-family:var(--font-mono); font-size:11.5px; letter-spacing:1px; text-transform:uppercase;
+    display:inline-flex; align-items:center; gap:7px; font-family:var(--font-mono); font-size:11.5px; letter-spacing:1px; text-transform:uppercase;
     color:var(--accent-strong); background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:999px;
-    padding:5px 12px; margin-bottom:14px;
+    padding:5px 12px; margin-bottom:16px;
   }
-  .hero__title{ font-size:clamp(24px,4vw,34px); line-height:1.18; margin-bottom:12px; }
+  .hero__eyebrow-dot{ width:6px; height:6px; border-radius:50%; background:var(--success); box-shadow:0 0 6px var(--success); flex:none; }
+  @media (prefers-reduced-motion:no-preference){ .hero__eyebrow-dot{ animation:heroPulse 1.8s ease-in-out infinite; } }
+  @keyframes heroPulse{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
+  .hero__title{
+    font-family:'Anton',sans-serif; font-weight:400; letter-spacing:.3px;
+    font-size:clamp(32px,5.6vw,56px); line-height:1.04; margin-bottom:16px; text-wrap:balance;
+  }
   .hero__title-gold{ background:linear-gradient(90deg,var(--gold-strong),var(--gold)); -webkit-background-clip:text; background-clip:text; color:transparent; }
-  .hero__sub{ font-size:14.5px; color:var(--text-dim); max-width:520px; line-height:1.55; margin-bottom:20px; }
+  .hero__sub{ font-size:15.5px; color:var(--text-dim); max-width:520px; line-height:1.6; margin-bottom:22px; }
+  .hero[data-enter]{ animation:heroEnter .6s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes heroEnter{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0); } }
+  @media (prefers-reduced-motion:reduce){ .hero[data-enter]{ animation:none; } }
   .hero__cta{ display:flex; gap:12px; flex-wrap:wrap; }
   .btn-lg{ padding:13px 22px; font-size:14.5px; border-radius:12px; }
   .hero__stats{ flex:1 1 280px; min-width:240px; display:grid; grid-template-columns:1fr; gap:10px; }
@@ -929,10 +938,32 @@
     })();
   </script>
 
+  <div id="backToMenuBar" class="back-to-menu" hidden>
+    <button type="button" id="btnBackToMenu">← Volver al menú</button>
+  </div>
+
+  <div id="landingContent" class="app-section">
+  <section class="hero" data-enter>
+    <div class="hero__text">
+      <span class="hero__eyebrow"><span class="hero__eyebrow-dot"></span>Resultados verificados en vivo</span>
+      <h2 class="hero__title">Picks deportivos con seguimiento <span class="hero__title-gold">100% transparente</span></h2>
+      <p class="hero__sub">Cada apuesta, cuota y resultado del Grupo Free, el Reto 1K y el Grupo VIP queda registrado acá tal cual sucedió — sin editar el pasado ni esconder las perdidas.</p>
+      <div class="hero__cta">
+        <a class="btn btn-gold btn-lg" href="https://wa.me/51925931665?text=Hola%2C%20quiero%20unirme%20al%20Grupo%20VIP" target="_blank" rel="noopener">Únete al Grupo VIP →</a>
+        <button type="button" class="btn btn-ghost btn-lg" data-goto-view="reto">Ver el Reto 1K en vivo</button>
+      </div>
+      <div class="hero__trust">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg>
+        Resultados 100% verificados · sin picks borrados ni editados
+        <span id="lastUpdatedBadge" class="hero__updated"></span>
+      </div>
+    </div>
+    <div class="hero__stats" id="heroStats"></div>
+  </section>
+
   <section id="launcherScreen" class="launcher-screen">
-    <svg class="launcher-screen__star" width="40" height="40" viewBox="0 0 24 24" fill="var(--gold)" stroke="none"><path d="M12 2l2.4 6.9L21 9l-5.5 4.6L17 21l-5-3.6L7 21l1.5-7.4L3 9l6.6-.1z"/></svg>
-    <h1 class="launcher-screen__title">¿Qué quieres ver?</h1>
-    <p class="launcher-screen__sub">Elige una sección para entrar.</p>
+    <h2 class="launcher-screen__title">Elige tu grupo</h2>
+    <p class="launcher-screen__sub">Accedé directo a los picks en vivo de cada grupo.</p>
     <div class="launcher-grid">
       <button type="button" class="launcher-card" data-launch="landing">
         <span class="launcher-card__label">Inicio</span>
@@ -955,29 +986,6 @@
         <span class="launcher-card__desc">Asesoría personalizada de banca</span>
       </button>
     </div>
-  </section>
-
-  <div id="backToMenuBar" class="back-to-menu" hidden>
-    <button type="button" id="btnBackToMenu">← Volver al menú</button>
-  </div>
-
-  <div id="landingContent" class="app-section" hidden>
-  <section class="hero">
-    <div class="hero__text">
-      <span class="hero__eyebrow">Resultados verificados en vivo</span>
-      <h2 class="hero__title">Picks deportivos con seguimiento <span class="hero__title-gold">100% transparente</span></h2>
-      <p class="hero__sub">Cada apuesta, cuota y resultado del Grupo Free, el Reto 1K y el Grupo VIP queda registrado acá tal cual sucedió — sin editar el pasado ni esconder las perdidas.</p>
-      <div class="hero__cta">
-        <a class="btn btn-gold btn-lg" href="https://wa.me/51925931665?text=Hola%2C%20quiero%20unirme%20al%20Grupo%20VIP" target="_blank" rel="noopener">Únete al Grupo VIP →</a>
-        <button type="button" class="btn btn-ghost btn-lg" data-goto-view="reto">Ver el Reto 1K en vivo</button>
-      </div>
-      <div class="hero__trust">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg>
-        Resultados 100% verificados · sin picks borrados ni editados
-        <span id="lastUpdatedBadge" class="hero__updated"></span>
-      </div>
-    </div>
-    <div class="hero__stats" id="heroStats"></div>
   </section>
 
   <section class="panel-promo" id="panelPromo">
@@ -3647,8 +3655,7 @@
   }
 
   function goToSection(key){
-    document.getElementById('launcherScreen').hidden = true;
-    document.getElementById('backToMenuBar').hidden = false;
+    document.getElementById('backToMenuBar').hidden = (key === 'landing');
     const landing = document.getElementById('landingContent');
     const dashboard = document.getElementById('dashboardContent');
     if (key === 'landing'){
@@ -3674,9 +3681,8 @@
   }
 
   function backToMenu(){
-    document.getElementById('launcherScreen').hidden = false;
     document.getElementById('backToMenuBar').hidden = true;
-    document.getElementById('landingContent').hidden = true;
+    document.getElementById('landingContent').hidden = false;
     document.getElementById('dashboardContent').hidden = true;
     window.scrollTo({ top: 0 });
   }
