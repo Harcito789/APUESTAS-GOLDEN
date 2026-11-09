@@ -593,6 +593,20 @@
   .toolbar{ display:flex; align-items:center; gap: 10px; flex-wrap: wrap; }
   .spacer{ flex: 1; }
 
+  .site-nav{ display:flex; align-items:center; gap:22px; }
+  .site-nav__link{
+    background:none; border:none; cursor:pointer; font-family:inherit;
+    font-size:13.5px; font-weight:500; color:var(--text-dim); padding:4px 0; position:relative;
+    transition:color .15s;
+  }
+  .site-nav__link::after{
+    content:''; position:absolute; left:0; right:0; bottom:-2px; height:1px; background:var(--accent-strong);
+    transform:scaleX(0); transform-origin:left; transition:transform .2s cubic-bezier(.2,.8,.2,1);
+  }
+  .site-nav__link:hover{ color:var(--text); }
+  .site-nav__link:hover::after{ transform:scaleX(1); }
+  @media (max-width:860px){ .site-nav{ display:none; } }
+
   /* ---------- Pills ---------- */
   .pill{ display:inline-flex; align-items:center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
   .pill__dot{ width: 6px; height: 6px; border-radius: 50%; }
@@ -964,6 +978,12 @@
         <p>GRUPO FREE &middot; RETO 1K &middot; GRUPO VIP</p>
       </div>
     </div>
+    <nav class="site-nav" id="siteNav">
+      <button type="button" class="site-nav__link" data-nav-target="top">Inicio</button>
+      <button type="button" class="site-nav__link" data-nav-target="grupos">Grupos</button>
+      <button type="button" class="site-nav__link" data-nav-target="noticias">Noticias</button>
+      <button type="button" class="site-nav__link" data-nav-target="faq">FAQ</button>
+    </nav>
     <div class="toolbar">
       <a class="btn btn-sm btn-ghost" href="https://panel.bigoldenbet.com/login.php" target="_blank" rel="noopener">Iniciar sesión</a>
       <a class="btn btn-sm btn-gold" href="https://panel.bigoldenbet.com/register.php" target="_blank" rel="noopener">Mi Panel</a>
@@ -1202,7 +1222,7 @@
     <div class="matches-updated" id="matchesUpdated"></div>
   </section>
 
-  <section class="news-section">
+  <section id="noticias" class="news-section">
     <div class="news-section__head">
       <span class="matches-live-badge"><span class="matches-live-badge__dot"></span>Noticias</span>
       <h2>Lo último del fútbol</h2>
@@ -3868,6 +3888,18 @@
     document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchView(t.dataset.view)));
     document.querySelectorAll('[data-goto-view]').forEach(b => b.addEventListener('click', () => {
       goToSection(b.dataset.gotoView);
+    }));
+    document.querySelectorAll('[data-nav-target]').forEach(b => b.addEventListener('click', () => {
+      const target = b.dataset.navTarget;
+      goToSection('landing');
+      if (target === 'top'){
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      setTimeout(() => {
+        const el = document.getElementById(target);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
     }));
     document.querySelectorAll('.subtab').forEach(t => t.addEventListener('click', () => switchRetoView(t.dataset.retoView)));
     document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => goToReto(b.dataset.goto)));
