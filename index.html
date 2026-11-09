@@ -1027,7 +1027,7 @@
     <div class="hero__stats" id="heroStats"></div>
   </section>
 
-  <section id="launcherScreen" class="launcher-screen">
+  <section id="grupos" class="launcher-screen">
     <h2 class="launcher-screen__title">Nuestros grupos, en números</h2>
     <p class="launcher-screen__sub">Resultados reales de cada grupo — tocá una tarjeta para ver el detalle en vivo.</p>
     <div class="group-cards" id="groupCards">
@@ -1209,7 +1209,7 @@
     </div>
   </section>
 
-  <section class="faq-section">
+  <section id="faq" class="faq-section">
     <h2>Preguntas frecuentes</h2>
     <div class="faq-list">
       <details class="faq-item">
@@ -2418,6 +2418,10 @@
     populateDayFilterOptions();
     renderAll();
     setupUI();
+    const urlView = new URLSearchParams(location.search).get('view');
+    if (urlView && ['free', 'reto', 'vip', 'bankroll'].includes(urlView)){
+      goToSection(urlView);
+    }
     if (!window.Chart){
       showToast('No se pudieron cargar los gráficos (falló la librería externa). El resto de la app funciona normalmente.', 'err');
     }
