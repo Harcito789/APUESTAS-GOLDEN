@@ -259,6 +259,37 @@
   .launcher-card.is-gold:hover{ border-color: var(--gold-strong); }
   .launcher-card__label{ font-size: 17px; font-weight: 700; color: var(--text); font-family: var(--font-display); }
   .launcher-card__desc{ font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
+
+  /* ---------- Grupos: tarjetas de resultado (número + mini-gráfica + beneficios) ---------- */
+  .group-cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; width:100%; max-width:980px; margin-bottom:18px; }
+  .group-card{
+    position:relative; text-align:left; background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius-lg);
+    padding:22px 20px 20px; display:flex; flex-direction:column; gap:12px; cursor:pointer; font-family:inherit;
+    transition:border-color .15s, transform .15s; overflow:hidden;
+  }
+  .group-card:hover{ transform:translateY(-3px); }
+  .group-card::before{ content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--gc-accent, var(--accent)); }
+  .group-card--free{ --gc-accent: var(--free); }
+  .group-card--free:hover{ border-color: var(--free-line); }
+  .group-card--reto{ --gc-accent: var(--accent-strong); }
+  .group-card--reto:hover{ border-color: var(--accent-line); }
+  .group-card--vip{ --gc-accent: var(--gold); border-color: var(--gold-line); background: linear-gradient(160deg, rgba(240,201,74,0.06), var(--surface) 55%); }
+  .group-card--vip:hover{ border-color: var(--gold-strong); }
+  .group-card__stat-label{ font-size:11px; text-transform:uppercase; letter-spacing:.6px; color: var(--gc-accent, var(--accent)); font-weight:700; }
+  .group-card__stat-val{ font-family:var(--font-display); font-size:28px; font-weight:800; color:var(--text); line-height:1.1; }
+  .group-card__title{ font-size:15px; font-weight:700; color:var(--text); }
+  .group-card__spark{ width:100%; height:36px; display:block; }
+  .group-card__list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:var(--text-dim); }
+  .group-card__cta{
+    margin-top:auto; align-self:flex-start; font-size:12.5px; font-weight:700; padding:8px 14px; border-radius:8px;
+    background:var(--gc-accent, var(--accent)); color:#0A0D12; border:none; cursor:pointer; font-family:inherit;
+  }
+  .group-links{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:4px; }
+  .group-link{
+    background:transparent; border:1px solid var(--border-soft); color:var(--text-dim); border-radius:999px;
+    padding:8px 16px; font-size:12.5px; cursor:pointer; font-family:inherit; transition:border-color .15s,color .15s;
+  }
+  .group-link:hover{ border-color:var(--accent-line); color:var(--text); }
   .back-to-menu{ margin-bottom: 14px; }
   .back-to-menu button{
     background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); border-radius: 999px;
@@ -962,29 +993,46 @@
   </section>
 
   <section id="launcherScreen" class="launcher-screen">
-    <h2 class="launcher-screen__title">Elige tu grupo</h2>
-    <p class="launcher-screen__sub">Accedé directo a los picks en vivo de cada grupo.</p>
-    <div class="launcher-grid">
-      <button type="button" class="launcher-card" data-launch="landing">
-        <span class="launcher-card__label">Inicio</span>
-        <span class="launcher-card__desc">Quiénes somos, cómo funciona, preguntas frecuentes</span>
+    <h2 class="launcher-screen__title">Nuestros grupos, en números</h2>
+    <p class="launcher-screen__sub">Resultados reales de cada grupo — tocá una tarjeta para ver el detalle en vivo.</p>
+    <div class="group-cards" id="groupCards">
+      <button type="button" class="group-card group-card--free" data-launch="free">
+        <span class="group-card__stat-label">Tasa de éxito</span>
+        <span class="group-card__stat-val" id="gcFreeStat">—</span>
+        <span class="group-card__title">Grupo Free</span>
+        <svg class="group-card__spark" id="gcFreeSpark" viewBox="0 0 120 36" preserveAspectRatio="none"></svg>
+        <ul class="group-card__list">
+          <li>✓ Picks públicos y gratuitos</li>
+          <li>✓ Estadísticas completas y en vivo</li>
+        </ul>
+        <span class="group-card__cta">Ver Grupo Free →</span>
       </button>
-      <button type="button" class="launcher-card" data-launch="free">
-        <span class="launcher-card__label">Grupo Free</span>
-        <span class="launcher-card__desc">Picks gratuitos y estadísticas en vivo</span>
+      <button type="button" class="group-card group-card--reto" data-launch="reto">
+        <span class="group-card__stat-label">Capital multiplicado</span>
+        <span class="group-card__stat-val" id="gcRetoStat">—</span>
+        <span class="group-card__title">Reto 1K</span>
+        <svg class="group-card__spark" id="gcRetoSpark" viewBox="0 0 120 36" preserveAspectRatio="none"></svg>
+        <ul class="group-card__list">
+          <li>✓ De S/5 a S/1,000 — la escalera en vivo</li>
+          <li>✓ Cada paso registrado tal cual sucedió</li>
+        </ul>
+        <span class="group-card__cta">Ver el Reto 1K →</span>
       </button>
-      <button type="button" class="launcher-card" data-launch="reto">
-        <span class="launcher-card__label">Reto 1K</span>
-        <span class="launcher-card__desc">De S/5 a S/1,000 — la escalera en vivo</span>
+      <button type="button" class="group-card group-card--vip" data-launch="vip">
+        <span class="group-card__stat-label">Tasa de éxito</span>
+        <span class="group-card__stat-val" id="gcVipStat">—</span>
+        <span class="group-card__title">Grupo VIP</span>
+        <svg class="group-card__spark" id="gcVipSpark" viewBox="0 0 120 36" preserveAspectRatio="none"></svg>
+        <ul class="group-card__list">
+          <li>✓ Bet Builders y combinadas exclusivas</li>
+          <li>✓ Acceso directo por WhatsApp</li>
+        </ul>
+        <span class="group-card__cta">Ver Grupo VIP →</span>
       </button>
-      <button type="button" class="launcher-card is-gold" data-launch="vip">
-        <span class="launcher-card__label">Grupo VIP</span>
-        <span class="launcher-card__desc">Picks premium y estadísticas exclusivas</span>
-      </button>
-      <button type="button" class="launcher-card is-gold" data-launch="bankroll">
-        <span class="launcher-card__label">Golden Bankroll</span>
-        <span class="launcher-card__desc">Asesoría personalizada de banca</span>
-      </button>
+    </div>
+    <div class="group-links">
+      <button type="button" class="group-link" data-launch="landing">Inicio — quiénes somos y cómo funciona</button>
+      <button type="button" class="group-link" data-launch="bankroll">Golden Bankroll — asesoría personalizada</button>
     </div>
   </section>
 
@@ -3108,6 +3156,56 @@
     el.innerHTML = stats.map(s => '<div class="s"><span class="v">' + esc(s.v) + '</span><span class="l">' + esc(s.l) + '</span></div>').join('');
   }
 
+  function buildSparkPoints(values){
+    if (!values || values.length < 2) return '';
+    const w = 120, h = 36, pad = 3;
+    const min = Math.min(...values), max = Math.max(...values);
+    const range = (max - min) || 1;
+    return values.map((v,i) => {
+      const x = (i / (values.length - 1)) * (w - pad*2) + pad;
+      const y = h - pad - ((v - min) / range) * (h - pad*2);
+      return x.toFixed(1) + ',' + y.toFixed(1);
+    }).join(' ');
+  }
+  function renderSpark(elId, values, color){
+    const el = document.getElementById(elId);
+    if (!el) return;
+    if (!values || values.length < 2){ el.innerHTML = ''; return; }
+    el.innerHTML = '<polyline points="' + buildSparkPoints(values) + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+  }
+  function buildGroupSeries(group){
+    const bets = getOrderedBets(group.arrayKey).filter(b => b.estado !== 'pendiente');
+    let running = 0;
+    const series = [0];
+    bets.forEach(b => { running += fromCents(computeBetDerived(b).gananciaCents || 0); series.push(running); });
+    return series;
+  }
+  function buildRetoSeries(){
+    const steps = getOrderedSteps().filter(s => s.estado === 'ganado' || s.estado === 'perdido' || s.estado === 'cashout');
+    const cfg = state.config || DEFAULT_CONFIG;
+    const series = [Number(cfg.capitalInicial) || 0];
+    steps.forEach(s => {
+      const d = computeDerived(s);
+      series.push(fromCents(d.retornoRealCents != null ? d.retornoRealCents : d.capitalInicialCents));
+    });
+    return series;
+  }
+  function renderGroupCards(){
+    const styleVar = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    const freeM = computeGroupMetrics(BET_GROUPS.free);
+    const vipM = computeGroupMetrics(BET_GROUPS.vip);
+    const g = computeGlobalStats();
+    const freeEl = document.getElementById('gcFreeStat');
+    if (freeEl) freeEl.textContent = freeM.resolved ? freeM.tasaExito.toFixed(1) + '%' : '—';
+    const vipEl = document.getElementById('gcVipStat');
+    if (vipEl) vipEl.textContent = vipM.resolved ? vipM.tasaExito.toFixed(1) + '%' : '—';
+    const retoEl = document.getElementById('gcRetoStat');
+    if (retoEl) retoEl.textContent = g.multiplo ? 'x' + g.multiplo.toFixed(1) : '—';
+    renderSpark('gcFreeSpark', buildGroupSeries(BET_GROUPS.free), styleVar('--free-strong'));
+    renderSpark('gcVipSpark', buildGroupSeries(BET_GROUPS.vip), styleVar('--gold'));
+    renderSpark('gcRetoSpark', buildRetoSeries(), styleVar('--accent-strong'));
+  }
+
   function renderAll(){
     if (!state.config) return;
     const m = computeMetrics();
@@ -3115,6 +3213,7 @@
     renderLastUpdatedBadge();
     renderRetoIntroStatus();
     renderVipCompareStats();
+    renderGroupCards();
     renderLadder();
     renderDashMetrics(m);
     renderProgressBar(m);
